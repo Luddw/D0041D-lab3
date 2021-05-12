@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.12)
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_FLAGS_DEBUG_INIT "-Wall")
+project(MyProject VERSION 1.0.0)
+SET(CMAKE_CXX_FLAGS -pthread)
+add_executable(AVL main.cc)
