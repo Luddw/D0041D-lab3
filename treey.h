@@ -1,42 +1,43 @@
 #pragma once
 #include <iostream>
-#include "treey.h"
+#include "avl.h"
 #define COUNT 10
 
-class TreeX;
-class TreeY;
 
-struct TreeNodeX
+
+int GetMax(const int a, const int b)
 {
-    TreeY* y_tree = new TreeY;
-    TreeNodeX* left;
-    TreeNodeX* right;
+    return (a > b) ? a : b;
+}
+
+
+struct TreeNodeY
+{
+    TreeNodeY* left;
+    TreeNodeY* right;
     int value;
     int depth;
 };
 
-class TreeX
+class TreeY
 {
 private:
-    TreeNodeX* m_root_node;
+    TreeNodeY* m_root_node;
     size_t m_node_count;
 public:
-    TreeX() : m_node_count(0) { m_root_node = NULL;};
-    ~TreeX() {};
+    TreeY() : m_node_count(0) {
+        m_root_node = NULL;
+    
+    
+    };
+    ~TreeY() {};
 
-    TreeNodeX* CreateNewNode(int key, int y_value)
+    void InsertAtRoot(int value)
     {
-        TreeNodeX* node = new TreeNodeX();
-        node->y_tree->InsertAtRoot(y_value);
-        node->value = key;
-        node->left = NULL;
-        node->right = NULL;
-        node->depth = 1;
-
-        return (node);
+        m_root_node = Insert(m_root_node, value);
     }
 
-    int GetHeight(TreeNodeX* node)
+    int GetHeight(TreeNodeY* node)
     {
         if (node == NULL)
         {
@@ -45,7 +46,7 @@ public:
         return node->depth;
     }
 
-    int GetBalance(TreeNodeX* node)
+    int GetBalance(TreeNodeY* node)
     {
         if (node == NULL)
         {
@@ -54,8 +55,19 @@ public:
 
         return GetHeight(node->left) - GetHeight(node->right);
     }
-    
-    TreeNodeX* Insert(TreeNodeX* node, int x_key, int y_key)
+
+    TreeNodeY* CreateNewNode(int key)
+    {
+        TreeNodeY* node = new TreeNodeY();
+        node->value = key;
+        node->left = NULL;
+        node->right = NULL;
+        node->depth = 1;
+
+        return (node);
+    }
+
+    TreeNodeY* Insert(TreeNodeY* node, int x_key)
     {
         if (m_node_count <= 0)
         {
@@ -64,13 +76,13 @@ public:
         
         if (node == NULL)
         {
-            return (CreateNewNode(x_key, y_key));
+            return (CreateNewNode(x_key));
         }
 
         if (x_key < node->value)
-            node->left = Insert(node->left, x_key, y_key);
+            node->left = Insert(node->left, x_key);
         else if (x_key > node->value)
-            node->right = Insert(node->right, x_key, y_key);
+            node->right = Insert(node->right, x_key);
         else
             return node;
 
@@ -105,7 +117,7 @@ public:
     }
 
 
-    void PrintTree(TreeNodeX* root)
+    void PrintTree(TreeNodeY* root)
     {
         if (root != NULL)
         {
@@ -115,15 +127,15 @@ public:
         }
     }
 
-    TreeNodeX* GetRoot()
+    TreeNodeY* GetRoot()
     {
         return m_root_node;
     }
 
-    TreeNodeX* RotateLeft(TreeNodeX* a)
+    TreeNodeY* RotateLeft(TreeNodeY* a)
     {
-        TreeNodeX* b = a->right;
-        TreeNodeX* subtree2 = b->left;
+        TreeNodeY* b = a->right;
+        TreeNodeY* subtree2 = b->left;
 
         b->left = a;
         a->right = subtree2;
@@ -135,10 +147,10 @@ public:
         return b;
     }
 
-    TreeNodeX* RotateRight(TreeNodeX* a)
+    TreeNodeY* RotateRight(TreeNodeY* a)
     {
-        TreeNodeX* b = a->left;
-        TreeNodeX* subtree2 = b->right;
+        TreeNodeY* b = a->left;
+        TreeNodeY* subtree2 = b->right;
 
         b->right = a;
         a->right = subtree2;
@@ -151,7 +163,7 @@ public:
     }
 
 
-    void print2DUtil(TreeNodeX *root, int space) 
+    void print2DUtil(TreeNodeY *root, int space) 
     { 
         // Base case 
         if (root == NULL) 
@@ -175,13 +187,9 @@ public:
     } 
   
 // Wrapper over print2DUtil() 
-    void print2D(TreeNodeX *root) 
+    void print2D(TreeNodeY *root) 
     { 
         // Pass initial space count as 0 
         print2DUtil(root, 0); 
     }
 };
-
-
-
-
