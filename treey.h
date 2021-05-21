@@ -10,7 +10,6 @@ int GetMax(const int a, const int b)
     return (a > b) ? a : b;
 }
 
-
 struct TreeNodeY
 {
     TreeNodeY* left;
@@ -18,6 +17,14 @@ struct TreeNodeY
     int value;
     int depth;
 };
+TreeNodeY* minValueNode(TreeNodeY* node)
+{
+    TreeNodeY* current = node;
+    while (current->left != NULL)
+        current = current->left;
+
+    return current;
+}
 
 class TreeY
 {
@@ -31,6 +38,97 @@ public:
     
     };
     ~TreeY() {};
+    TreeNodeY* Remove(TreeNodeY* root, int key)
+    {
+
+
+        if (root == NULL)
+            return root;
+
+
+        if (key < root->value)
+            root->left = Remove(root->left, key);
+
+
+        else if (key > root->value)
+            root->right = Remove(root->right, key);
+
+
+        else
+        {
+          
+            if ((root->left == NULL) ||
+                (root->right == NULL))
+            {
+                TreeNodeY* temp = root->left ?
+                    root->left :
+                    root->right;
+
+               
+                if (temp == NULL)
+                {
+                    temp = root;
+                    root = NULL;
+                }
+                else 
+                    *root = *temp;  
+                                  
+                free(temp);
+            }
+            else
+            {
+
+                TreeNodeY* temp = minValueNode(root->right);
+
+
+                root->value = temp->value;
+
+
+                root->right = Remove(root->right,
+                    temp->value);
+            }
+        }
+
+
+        if (root == NULL)
+            return root;
+
+
+        root->depth = 1 + GetMax(GetHeight(root->left),
+            GetHeight(root->right));
+
+        int balance = GetBalance(root);
+
+        // Rotations 
+
+        // Left Left 
+        if (balance > 1 &&
+            GetBalance(root->left) >= 0)
+            return RotateRight(root);
+
+        // Left Right 
+        if (balance > 1 &&
+            GetBalance(root->left) < 0)
+        {
+            root->left = RotateLeft(root->left);
+            return RotateRight(root);
+        }
+
+        // Right Right 
+        if (balance < -1 &&
+            GetBalance(root->right) <= 0)
+            return RotateLeft(root);
+
+        // Right Left 
+        if (balance < -1 &&
+            GetBalance(root->right) > 0)
+        {
+            root->right = RotateRight(root->right);
+            return RotateLeft(root);
+        }
+
+        return root;
+    }
 
     void InsertAtRoot(int value)
     {
@@ -121,7 +219,7 @@ public:
     {
         if (root != NULL)
         {
-            printf("node value %d at depth %d \n", root->value, root->depth);
+            printf("%d ", root->value);
             PrintTree(root->left);
             PrintTree(root->right);
         }

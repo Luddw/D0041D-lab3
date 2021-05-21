@@ -14,7 +14,14 @@ struct TreeNodeX
     int value;
     int depth;
 };
+TreeNodeX* minValueNode(TreeNodeX* node)
+{
+    TreeNodeX* current = node;
+    while (current->left != NULL)
+        current = current->left;
 
+    return current;
+}
 class TreeX
 {
 private:
@@ -24,10 +31,99 @@ public:
     TreeX() : m_node_count(0) { m_root_node = NULL;};
     ~TreeX() {};
 
-    TreeNodeX* CreateNewNode(int key, int y_value)
+
+    TreeNodeX* Remove(TreeNodeX* root, int key)
+    {
+        if (root == NULL)
+            return root;
+
+        if (key < root->value)
+            root->left = Remove(root->left, key);
+
+  
+        else if (key > root->value)
+            root->right = Remove(root->right, key);
+
+
+        else
+        {
+           
+            if ((root->left == NULL) ||
+                (root->right == NULL))
+            {
+                TreeNodeX* temp = root->left ?
+                    root->left :
+                    root->right;
+
+              
+                if (temp == NULL)
+                {
+                    temp = root;
+                    root = NULL;
+                }
+                else 
+                    *root = *temp;
+                                  
+                free(temp);
+            }
+            else
+            {
+  
+                TreeNodeX* temp = minValueNode(root->right);
+
+                root->value = temp->value;
+
+                root->right = Remove(root->right,
+                    temp->value);
+            }
+        }
+
+  
+        if (root == NULL)
+            return root;
+
+   
+        root->depth = 1 + GetMax(GetHeight(root->left),
+            GetHeight(root->right));
+
+        int balance = GetBalance(root);
+
+  
+        // Rotations 
+
+        // Left Left 
+        if (balance > 1 &&
+            GetBalance(root->left) >= 0)
+            return RotateRight(root);
+
+        // Left Right 
+        if (balance > 1 &&
+            GetBalance(root->left) < 0)
+        {
+            root->left = RotateLeft(root->left);
+            return RotateRight(root);
+        }
+
+        // Right Right 
+        if (balance < -1 &&
+            GetBalance(root->right) <= 0)
+            return RotateLeft(root);
+
+        // Right Left 
+        if (balance < -1 &&
+            GetBalance(root->right) > 0)
+        {
+            root->right = RotateRight(root->right);
+            return RotateLeft(root);
+        }
+
+        return root;
+    }
+
+    TreeNodeX* CreateNewNode(int key, int y_val)
     {
         TreeNodeX* node = new TreeNodeX();
-        node->y_tree->InsertAtRoot(y_value);
+        node->y_tree->InsertAtRoot(y_val);
         node->value = key;
         node->left = NULL;
         node->right = NULL;
@@ -55,7 +151,7 @@ public:
         return GetHeight(node->left) - GetHeight(node->right);
     }
     
-    TreeNodeX* Insert(TreeNodeX* node, int x_key, int y_key)
+    TreeNodeX* Insert(TreeNodeX* node, int x_key, int ytree)
     {
         if (m_node_count <= 0)
         {
@@ -64,13 +160,13 @@ public:
         
         if (node == NULL)
         {
-            return (CreateNewNode(x_key, y_key));
+            return (CreateNewNode(x_key, ytree));
         }
 
         if (x_key < node->value)
-            node->left = Insert(node->left, x_key, y_key);
+            node->left = Insert(node->left, x_key, ytree);
         else if (x_key > node->value)
-            node->right = Insert(node->right, x_key, y_key);
+            node->right = Insert(node->right, x_key, ytree);
         else
             return node;
 
@@ -168,7 +264,9 @@ public:
         std::cout << std::endl; 
         for (int i = COUNT; i < space; i++) 
             std::cout<<" "; 
-        std::cout<< root->value <<"\n"; 
+        std::cout<< "x: " << root->value << "y: ";
+        root->y_tree->PrintTree(root->y_tree->GetRoot());
+        std::cout << "\n";
     
         // Process left child 
         print2DUtil(root->left, space); 
